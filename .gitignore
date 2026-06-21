@@ -1,0 +1,11 @@
+.env
+node_modules/
+supabase/.temp/
+temp/
+hero/
+aibin/
+about/
+sdas/
+mediassist/
+zeta/
+about-portrait.jpg

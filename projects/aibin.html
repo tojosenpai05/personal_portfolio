@@ -1,0 +1,514 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AiBin | Anantojo Mendan</title>
+  <meta name="description" content="AiBin: an AI-powered smart waste sorting bin using YOLOv8 and a Raspberry Pi 5 to classify waste into 4 compartments in real time." />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../css/global.css" />
+  <link rel="stylesheet" href="../css/case-study.css" />
+</head>
+<body data-preloader="Opening AiBin Project">
+
+<div id="preloader"><div id="preloader-letters"></div><p id="preloader-sub">Full Stack · Electronic · AI</p><div id="preloader-line"></div></div>
+<div id="modal-overlay"></div>
+<div id="lightbox"><button id="lightbox-close">&#10005;</button><img id="lightbox-img" src="" alt="" /></div>
+
+<header class="navbar">
+  <div class="navbar-inner">
+    <a href="../index.html" class="navbar-logo">.anan</a>
+    <nav class="navbar-links">
+      <a href="../about.html">About</a>
+      <a href="../work.html">Work</a>
+      <a href="../index.html#services">Services</a>
+      <button class="navbar-book" data-book>Book a call &#8594;</button>
+    </nav>
+    <button class="hamburger" aria-label="Open menu"><span></span><span></span><span></span></button>
+  </div>
+  <div class="mobile-menu">
+    <div class="mobile-menu-inner">
+      <a href="../about.html">About</a>
+      <a href="../work.html">Work</a>
+      <a href="../index.html#services">Services</a>
+      <button class="navbar-book" data-book>Book a call &#8594;</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <!-- Hero -->
+  <section class="cs-hero">
+    <div class="container">
+      <div class="cs-hero-inner">
+        <a href="../work.html" class="cs-back">&#8592; Back</a>
+        <span class="cs-cat">IoT / Hardware</span>
+        <h1 class="cs-title">AiBin</h1>
+        <p class="cs-subtitle">Autonomous Waste Segregation Bin</p>
+        <div class="cs-meta-pills">
+          <span class="cs-meta-pill">Hardware &amp; Software Engineer</span>
+          <span class="cs-meta-pill">3 months</span>
+        </div>
+      </div>
+      <div class="cs-banner">
+        <video id="cs-hero-video" autoplay muted playsinline
+          data-srcs='["../aibin/demo-01.mp4","../aibin/demo-02.mp4","../aibin/demo-03.mp4","../aibin/demo-04.mp4","../aibin/demo-05.mp4","../aibin/demo-06.mp4"]'>
+        </video>
+      </div>
+    </div>
+  </section>
+
+  <!-- Body -->
+  <section class="cs-body">
+    <div class="container cs-body-inner">
+
+      <!-- Block 1: At a Glance -->
+      <div class="cs-block reveal">
+        <span class="cs-block-label">At a Glance</span>
+        <div class="cs-metric-grid">
+          <div class="cs-metric-card">
+            <span class="cs-metric-val">&gt;85%</span>
+            <span class="cs-metric-label">Classification Accuracy</span>
+            <span class="cs-metric-sub">on-device</span>
+          </div>
+          <div class="cs-metric-card">
+            <span class="cs-metric-val">~50ms</span>
+            <span class="cs-metric-label">Inference Speed</span>
+            <span class="cs-metric-sub">per frame</span>
+          </div>
+          <div class="cs-metric-card">
+            <span class="cs-metric-val">4</span>
+            <span class="cs-metric-label">Waste Categories</span>
+          </div>
+          <div class="cs-metric-card">
+            <span class="cs-metric-val">Zero</span>
+            <span class="cs-metric-label">Cloud Dependency</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Block 2: Overview -->
+      <div class="cs-block reveal">
+        <span class="cs-block-label">Overview</span>
+        <h2 class="cs-block-title">What is it?</h2>
+        <div class="cs-overview-grid">
+          <p class="cs-overview-text">An edge-AI smart bin that automatically sorts waste into 4 categories using a camera and on-device YOLOv8 model, with no cloud required.</p>
+          <div class="cs-overview-img">
+            <img src="https://ygfspynwnprdhnuvmphi.supabase.co/storage/v1/object/public/images/aibin/bin-compartments-a.png" alt="Top-down view of bin interior labeled Metal, Plastic, Paper and Others" data-lightbox />
+          </div>
+        </div>
+      </div>
+
+      <!-- Block 3: The Problem -->
+      <div class="cs-block reveal">
+        <span class="cs-block-label">The Problem</span>
+        <h2 class="cs-block-title">What needed solving?</h2>
+        <p class="cs-problem-text">Manual waste sorting is inconsistent and time-consuming. Recycling stations need automation that works without internet connectivity. Most existing solutions depend on cloud APIs with latency too high for real-time servo actuation.</p>
+        <blockquote class="cs-blockquote">Manual waste sorting is inconsistent and time-consuming.</blockquote>
+      </div>
+
+      <!-- Block 4: Process -->
+      <div class="cs-block reveal">
+        <span class="cs-block-label">Process</span>
+        <h2 class="cs-block-title">How it was built</h2>
+        <div class="cs-process">
+          <div class="cs-process-item">
+            <div class="cs-process-step">
+              <div class="cs-process-node">01</div>
+              <span class="cs-process-label">Requirements</span>
+              <span class="cs-process-desc">Define waste categories and sorting accuracy targets</span>
+            </div>
+            <div class="cs-process-arrow">&#8594;</div>
+          </div>
+          <div class="cs-process-item">
+            <div class="cs-process-step">
+              <div class="cs-process-node">02</div>
+              <span class="cs-process-label">CAD &amp; Circuit Design</span>
+              <span class="cs-process-desc">3D model bin enclosure, design servo mount and circuit</span>
+            </div>
+            <div class="cs-process-arrow">&#8594;</div>
+          </div>
+          <div class="cs-process-item">
+            <div class="cs-process-step">
+              <div class="cs-process-node">03</div>
+              <span class="cs-process-label">Prototype Mechanism</span>
+              <span class="cs-process-desc">Build and test dual-servo sorting gate</span>
+            </div>
+            <div class="cs-process-arrow">&#8594;</div>
+          </div>
+          <div class="cs-process-item">
+            <div class="cs-process-step">
+              <div class="cs-process-node">04</div>
+              <span class="cs-process-label">Train YOLOv8 Model</span>
+              <span class="cs-process-desc">Collect dataset, annotate, train and export model</span>
+            </div>
+            <div class="cs-process-arrow">&#8594;</div>
+          </div>
+          <div class="cs-process-item">
+            <div class="cs-process-step">
+              <div class="cs-process-node">05</div>
+              <span class="cs-process-label">System Integration</span>
+              <span class="cs-process-desc">Connect inference pipeline to servo controller</span>
+            </div>
+            <div class="cs-process-arrow">&#8594;</div>
+          </div>
+          <div class="cs-process-item">
+            <div class="cs-process-step">
+              <div class="cs-process-node">06</div>
+              <span class="cs-process-label">Field Testing</span>
+              <span class="cs-process-desc">Validate accuracy with real waste samples</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Block 5: Architecture -->
+      <div class="cs-block reveal">
+        <span class="cs-block-label">Architecture</span>
+        <h2 class="cs-block-title">System design</h2>
+        <div class="cs-arch">
+          <div class="cs-arch-row">
+            <div class="cs-arch-node"><div class="cs-arch-node-label">Camera</div><div class="cs-arch-node-sub">USB</div></div>
+            <span class="cs-arch-arrow">&#8594;</span>
+            <div class="cs-arch-node highlight"><div class="cs-arch-node-label">YOLOv8</div><div class="cs-arch-node-sub">Raspberry Pi 5</div></div>
+            <span class="cs-arch-arrow">&#8594;</span>
+            <div class="cs-arch-node"><div class="cs-arch-node-label">Servo Controller</div><div class="cs-arch-node-sub">Dual servo</div></div>
+            <span class="cs-arch-arrow">&#8594;</span>
+            <div class="cs-arch-group">
+              <div class="cs-arch-group-label">Waste Compartments</div>
+              <div class="cs-arch-node"><div class="cs-arch-node-label">Paper</div></div>
+              <div class="cs-arch-node"><div class="cs-arch-node-label">Plastic</div></div>
+              <div class="cs-arch-node"><div class="cs-arch-node-label">Metal</div></div>
+              <div class="cs-arch-node"><div class="cs-arch-node-label">Organic</div></div>
+            </div>
+          </div>
+          <div class="cs-arch-sep"></div>
+          <div class="cs-arch-row">
+            <div class="cs-arch-node highlight"><div class="cs-arch-node-label">Node.js API</div><div class="cs-arch-node-sub">REST</div></div>
+            <span class="cs-arch-arrow">&#8594;</span>
+            <div class="cs-arch-node"><div class="cs-arch-node-label">Marketplace</div><div class="cs-arch-node-sub">Sell sorted waste</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Block 6: Solution -->
+      <div class="cs-block reveal">
+        <span class="cs-block-label">Solution</span>
+        <h2 class="cs-block-title">How we solved it</h2>
+        <p class="cs-solution-text">Built a Raspberry Pi 5-powered bin with a live camera feed running YOLOv8 inference locally. A dual-servo mechanism routes waste to the correct compartment. A Node.js REST API exposes a recycling marketplace so users can sell sorted materials.</p>
+        <div class="cs-solution-img">
+          <img src="https://ygfspynwnprdhnuvmphi.supabase.co/storage/v1/object/public/images/aibin/presentation-anan-presenting.jpeg" alt="Anan in suit and tie presenting AiBin to a panel" data-lightbox />
+        </div>
+      </div>
+
+      <!-- Block 7: Technology -->
+      <div class="cs-block reveal">
+        <span class="cs-block-label">Technology</span>
+        <h2 class="cs-block-title">Why these technologies?</h2>
+        <div class="cs-tech-wrap">
+          <table class="cs-tech-table">
+            <thead><tr><th>Technology</th><th>Why we chose it</th><th>Role in system</th></tr></thead>
+            <tbody>
+              <tr><td>YOLOv8</td><td>Best real-time object detection for edge deployment; runs at ~50ms inference on Pi 5 CPU without a GPU.</td><td>Core inference engine</td></tr>
+              <tr><td>Raspberry Pi 5</td><td>Sufficient compute for YOLOv8 inference; GPIO pins drive servo motors directly; USB interface for camera.</td><td>Host computer + GPIO</td></tr>
+              <tr><td>Node.js</td><td>Lightweight async runtime for the marketplace API; handles concurrent recycling requests without blocking I/O.</td><td>Marketplace API</td></tr>
+              <tr><td>Tinkercad</td><td>Browser-based 3D CAD with no cost or setup, ideal for rapid prototyping of the bin enclosure and servo mount.</td><td>3D enclosure design</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Block 8: Performance -->
+      <div class="cs-block reveal">
+        <span class="cs-block-label">Performance</span>
+        <h2 class="cs-block-title">Key metrics</h2>
+        <div class="cs-metric-bars">
+          <div class="cs-mbar">
+            <div class="cs-mbar-row">
+              <div class="cs-mbar-info"><span class="cs-mbar-label">Classification Accuracy</span><span class="cs-mbar-sub">on-device</span></div>
+              <span class="cs-mbar-val">&gt;85%</span>
+            </div>
+            <div class="cs-mbar-track"><div class="cs-mbar-fill" data-bar-width="85"></div></div>
+          </div>
+          <div class="cs-mbar">
+            <div class="cs-mbar-row">
+              <div class="cs-mbar-info"><span class="cs-mbar-label">Inference Speed</span><span class="cs-mbar-sub">per frame</span></div>
+              <span class="cs-mbar-val">~50ms</span>
+            </div>
+            <div class="cs-mbar-track"><div class="cs-mbar-fill" data-bar-width="72"></div></div>
+          </div>
+          <div class="cs-mbar">
+            <div class="cs-mbar-row">
+              <div class="cs-mbar-info"><span class="cs-mbar-label">Waste Categories</span></div>
+              <span class="cs-mbar-val">4</span>
+            </div>
+            <div class="cs-mbar-track"><div class="cs-mbar-fill" data-bar-width="100"></div></div>
+          </div>
+          <div class="cs-mbar">
+            <div class="cs-mbar-row">
+              <div class="cs-mbar-info"><span class="cs-mbar-label">Cloud Dependency</span></div>
+              <span class="cs-mbar-val">Zero</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Block 9: Results -->
+      <div class="cs-block reveal">
+        <span class="cs-block-label">Results</span>
+        <h2 class="cs-block-title">What we achieved</h2>
+        <div class="cs-outcomes-grid">
+          <div class="cs-outcome-item"><span class="cs-outcome-check">&#10003;</span><p class="cs-outcome-text">4-class waste classification (paper, plastic, metal, organic) at &gt;85% accuracy</p></div>
+          <div class="cs-outcome-item"><span class="cs-outcome-check">&#10003;</span><p class="cs-outcome-text">Fully local inference with zero cloud latency or external dependency</p></div>
+          <div class="cs-outcome-item"><span class="cs-outcome-check">&#10003;</span><p class="cs-outcome-text">Custom 3D-printed dual-servo sorting mechanism</p></div>
+          <div class="cs-outcome-item"><span class="cs-outcome-check">&#10003;</span><p class="cs-outcome-text">Node.js REST API backend with recycling marketplace endpoints</p></div>
+          <div class="cs-outcome-item"><span class="cs-outcome-check">&#10003;</span><p class="cs-outcome-text">Recyclable material tracking and sell-back workflow</p></div>
+        </div>
+      </div>
+
+      <!-- Block 10: Stack -->
+      <div class="cs-block reveal">
+        <span class="cs-block-label">Stack</span>
+        <h2 class="cs-block-title">Technologies used</h2>
+        <div class="cs-stack">
+          <span class="cs-stack-chip">Raspberry Pi 5</span>
+          <span class="cs-stack-chip">ESP32</span>
+          <span class="cs-stack-chip">YOLOv8</span>
+          <span class="cs-stack-chip">Python</span>
+          <span class="cs-stack-chip">Node.js</span>
+          <span class="cs-stack-chip">C++</span>
+          <span class="cs-stack-chip">Tinkercad</span>
+        </div>
+      </div>
+
+      <!-- Block 11a: Gallery : Final Product -->
+      <div class="cs-block reveal">
+        <span class="cs-block-label">Gallery</span>
+        <h2 class="cs-block-title">Final Product</h2>
+        <p style="font-size:1.6rem;color:var(--dark);max-width:72rem;line-height:1.7">The completed AiBin unit: a standard waste bin fitted with a dome lid housing the Pi Camera V2, with a servo-driven cross-divider inside routing waste into four labelled compartments.</p>
+        <div class="cs-gallery-grid last-odd">
+          <figure class="cs-gallery-figure">
+            <img class="cs-gallery-img" src="https://ygfspynwnprdhnuvmphi.supabase.co/storage/v1/object/public/images/aibin/product-render.png" alt="AiBin final product: overall view and top-down interior view" data-lightbox />
+            <figcaption class="cs-gallery-caption">Final product design</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <!-- Block 11b: Gallery : Hardware & Assembly -->
+      <div class="cs-block reveal">
+        <span class="cs-block-label">Gallery</span>
+        <h2 class="cs-block-title">Hardware &amp; Assembly</h2>
+        <p style="font-size:1.6rem;color:var(--dark);max-width:72rem;line-height:1.7">The physical build: Raspberry Pi 5, ESP32, dual servo motors, ultrasonic sensor, and Pi Camera V2 wired up on a breadboard before being mounted into the enclosure.</p>
+        <div class="cs-gallery-grid last-odd">
+          <figure class="cs-gallery-figure">
+            <img class="cs-gallery-img" src="https://ygfspynwnprdhnuvmphi.supabase.co/storage/v1/object/public/images/aibin/hardware-setup.jpeg" alt="Raspberry Pi 5, ESP32, servo motors and camera module on a workbench" data-lightbox />
+            <figcaption class="cs-gallery-caption">Hardware assembly and prototype setup</figcaption>
+          </figure>
+          <figure class="cs-gallery-figure">
+            <img class="cs-gallery-img" src="https://ygfspynwnprdhnuvmphi.supabase.co/storage/v1/object/public/images/aibin/bin-physical.jpeg" alt="Black bin with 4-compartment divider insert" data-lightbox />
+            <figcaption class="cs-gallery-caption">Physical bin enclosure</figcaption>
+          </figure>
+          <figure class="cs-gallery-figure">
+            <img class="cs-gallery-img" src="https://ygfspynwnprdhnuvmphi.supabase.co/storage/v1/object/public/images/aibin/fabrication.jpeg" alt="Cutting bin enclosure panels with a jigsaw" data-lightbox />
+            <figcaption class="cs-gallery-caption">Fabrication process</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <!-- Block 11c: Gallery : Bin Interior & Sorting Mechanism -->
+      <div class="cs-block reveal">
+        <span class="cs-block-label">Gallery</span>
+        <h2 class="cs-block-title">Bin Interior &amp; Sorting Mechanism</h2>
+        <p style="font-size:1.6rem;color:var(--dark);max-width:72rem;line-height:1.7">A cross-divider splits the bin into four compartments (Metal, Plastic, Paper, Others). The servo-driven plate rotates to route waste into the correct section based on the YOLOv8 classification.</p>
+        <div class="cs-gallery-grid">
+          <figure class="cs-gallery-figure">
+            <img class="cs-gallery-img" src="https://ygfspynwnprdhnuvmphi.supabase.co/storage/v1/object/public/images/aibin/bin-compartments-a.png" alt="Top-down view of bin interior labeled Metal, Plastic, Paper and Others" data-lightbox />
+            <figcaption class="cs-gallery-caption">4-compartment sorting mechanism</figcaption>
+          </figure>
+          <figure class="cs-gallery-figure">
+            <img class="cs-gallery-img" src="https://ygfspynwnprdhnuvmphi.supabase.co/storage/v1/object/public/images/aibin/presentation-bin-interior.jpeg" alt="Inside the AiBin showing the 3D-printed cross-divider and servo motor" data-lightbox />
+            <figcaption class="cs-gallery-caption">Servo mechanism inside the bin</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <!-- Block 11d: Gallery : CAD Design -->
+      <div class="cs-block reveal">
+        <span class="cs-block-label">Gallery</span>
+        <h2 class="cs-block-title">CAD Design (Tinkercad)</h2>
+        <p style="font-size:1.6rem;color:var(--dark);max-width:72rem;line-height:1.7">All mechanical parts were modelled in Tinkercad and 3D printed. This includes the servo holder bracket, sorting plate, servo arm linkages, and the dome lid that houses the camera.</p>
+        <div class="cs-gallery-grid last-odd">
+          <figure class="cs-gallery-figure">
+            <img class="cs-gallery-img" src="https://ygfspynwnprdhnuvmphi.supabase.co/storage/v1/object/public/images/aibin/cad-servo-holder.png" alt="Tinkercad 3D model of servo holder bracket" data-lightbox />
+            <figcaption class="cs-gallery-caption">CAD: servo holder</figcaption>
+          </figure>
+          <figure class="cs-gallery-figure">
+            <img class="cs-gallery-img" src="https://ygfspynwnprdhnuvmphi.supabase.co/storage/v1/object/public/images/aibin/cad-lid.png" alt="Tinkercad top-down view of bin lid plate design" data-lightbox />
+            <figcaption class="cs-gallery-caption">CAD: bin lid</figcaption>
+          </figure>
+          <figure class="cs-gallery-figure">
+            <img class="cs-gallery-img" src="https://ygfspynwnprdhnuvmphi.supabase.co/storage/v1/object/public/images/aibin/cad-plate.png" alt="Tinkercad oval sorting plate design" data-lightbox />
+            <figcaption class="cs-gallery-caption">CAD: sorting plate</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <!-- Block 11e: Gallery : Live YOLOv8 Inference -->
+      <div class="cs-block reveal">
+        <span class="cs-block-label">Gallery</span>
+        <h2 class="cs-block-title">Live YOLOv8 Inference</h2>
+        <p style="font-size:1.6rem;color:var(--dark);max-width:72rem;line-height:1.7">YOLOv8 runs fully on-device at approximately 50ms per frame. The camera looks down into the bin opening; the model classifies the item in real time and triggers the servo before it lands.</p>
+        <div class="cs-gallery-grid last-odd">
+          <figure class="cs-gallery-figure">
+            <img class="cs-gallery-img" src="https://ygfspynwnprdhnuvmphi.supabase.co/storage/v1/object/public/images/aibin/inference-plastic-a.png" alt="YOLOv8 live inference showing BIN: PLASTIC classification" data-lightbox />
+            <figcaption class="cs-gallery-caption">Live inference: plastic detected</figcaption>
+          </figure>
+          <figure class="cs-gallery-figure">
+            <img class="cs-gallery-img" src="https://ygfspynwnprdhnuvmphi.supabase.co/storage/v1/object/public/images/aibin/inference-paper-a.png" alt="YOLOv8 live inference showing BIN: PAPER at 0.84 confidence" data-lightbox />
+            <figcaption class="cs-gallery-caption">Live inference: paper at 84% confidence</figcaption>
+          </figure>
+          <figure class="cs-gallery-figure">
+            <img class="cs-gallery-img" src="https://ygfspynwnprdhnuvmphi.supabase.co/storage/v1/object/public/images/aibin/inference-metal-a.png" alt="YOLOv8 live inference showing BIN: METAL with aluminium can" data-lightbox />
+            <figcaption class="cs-gallery-caption">Live inference: metal can detected</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <!-- Block 11f: Gallery : Web App -->
+      <div class="cs-block reveal">
+        <span class="cs-block-label">Gallery</span>
+        <h2 class="cs-block-title">Web App</h2>
+        <p style="font-size:1.6rem;color:var(--dark);max-width:72rem;line-height:1.7">A companion Node.js web app tracks fill levels per compartment, logs waste analytics over time, calculates the monetary value of sorted recyclables, and shows nearby collection points on a map.</p>
+        <div class="cs-device-showcase">
+          <div class="cs-device-tablet-wrap">
+            <div class="cs-tablet">
+              <div class="cs-tablet-camera"></div>
+              <div class="cs-tablet-screen"><img src="https://ygfspynwnprdhnuvmphi.supabase.co/storage/v1/object/public/images/aibin/app-dashboard-browser.png" alt="AiBin web dashboard in browser" /></div>
+              <div class="cs-tablet-bar"></div>
+            </div>
+          </div>
+          <div class="cs-device-phone-wrap">
+            <div class="cs-phone">
+              <div class="cs-phone-notch"></div>
+              <div class="cs-phone-screen"><img src="https://ygfspynwnprdhnuvmphi.supabase.co/storage/v1/object/public/images/aibin/app-navigator-sm.png" alt="AiBin navigator with nearby bin locations listing" /></div>
+              <div class="cs-phone-bar"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Block 11g: Gallery : Presentation & Demo Day -->
+      <div class="cs-block reveal">
+        <span class="cs-block-label">Gallery</span>
+        <h2 class="cs-block-title">Presentation &amp; Demo Day</h2>
+        <p style="font-size:1.6rem;color:var(--dark);max-width:72rem;line-height:1.7">Final year project presentation and live demonstration. The AiBin system was shown to judges with the physical bin, live YOLOv8 inference, and the full web dashboard running in real time.</p>
+        <div class="cs-gallery-grid last-odd">
+          <figure class="cs-gallery-figure">
+            <img class="cs-gallery-img" src="https://ygfspynwnprdhnuvmphi.supabase.co/storage/v1/object/public/images/aibin/presentation-team-group.jpeg" alt="Full project team group photo at the final year project presentation" data-lightbox />
+            <figcaption class="cs-gallery-caption">Project team at presentation day</figcaption>
+          </figure>
+          <figure class="cs-gallery-figure">
+            <img class="cs-gallery-img" src="https://ygfspynwnprdhnuvmphi.supabase.co/storage/v1/object/public/images/aibin/presentation-anan-slide.jpeg" alt="Anan standing beside the AiBin final year project presentation slide" data-lightbox />
+            <figcaption class="cs-gallery-caption">Presenting AiBin</figcaption>
+          </figure>
+          <figure class="cs-gallery-figure">
+            <img class="cs-gallery-img" src="https://ygfspynwnprdhnuvmphi.supabase.co/storage/v1/object/public/images/aibin/presentation-setup.jpeg" alt="Full AiBin demo setup: presentation monitor, laptop showing analytics, and the physical bin" data-lightbox />
+            <figcaption class="cs-gallery-caption">Full demo station setup</figcaption>
+          </figure>
+        </div>
+      </div>
+
+      <!-- Block 12: Impact -->
+      <div class="cs-block reveal">
+        <span class="cs-block-label">Impact</span>
+        <h2 class="cs-block-title">Why it matters</h2>
+        <div class="cs-impact-grid">
+          <div class="cs-impact-card">
+            <span class="cs-impact-label">Environmental</span>
+            <ul class="cs-impact-points">
+              <li class="cs-impact-point"><span class="cs-impact-bullet">&#8226;</span><span class="cs-impact-text">Reduces recyclable waste contamination by sorting at the point of disposal before materials mix in a general bin.</span></li>
+              <li class="cs-impact-point"><span class="cs-impact-bullet">&#8226;</span><span class="cs-impact-text">On-device YOLOv8 inference uses zero cloud server energy. The system draws only what the Pi 5 consumes.</span></li>
+              <li class="cs-impact-point"><span class="cs-impact-bullet">&#8226;</span><span class="cs-impact-text">Higher diversion rates for paper, plastic, and metal reduce the volume of material sent to landfill.</span></li>
+              <li class="cs-impact-point"><span class="cs-impact-bullet">&#8226;</span><span class="cs-impact-text">Encourages closed-loop recycling: sorted material goes directly to the right collection stream.</span></li>
+            </ul>
+          </div>
+          <div class="cs-impact-card">
+            <span class="cs-impact-label">Social</span>
+            <ul class="cs-impact-points">
+              <li class="cs-impact-point"><span class="cs-impact-bullet">&#8226;</span><span class="cs-impact-text">No knowledge of recycling categories required from the user. The bin decides, not the person.</span></li>
+              <li class="cs-impact-point"><span class="cs-impact-bullet">&#8226;</span><span class="cs-impact-text">Monetization reward reinforces recycling behavior and makes responsible disposal tangible.</span></li>
+              <li class="cs-impact-point"><span class="cs-impact-bullet">&#8226;</span><span class="cs-impact-text">Deployable in schools, offices, and public spaces to normalise automated waste segregation.</span></li>
+              <li class="cs-impact-point"><span class="cs-impact-bullet">&#8226;</span><span class="cs-impact-text">Shows that AI hardware projects addressing real community problems are buildable by one person in three months.</span></li>
+            </ul>
+          </div>
+          <div class="cs-impact-card">
+            <span class="cs-impact-label">Economic</span>
+            <ul class="cs-impact-points">
+              <li class="cs-impact-point"><span class="cs-impact-bullet">&#8226;</span><span class="cs-impact-text">Sorted recyclables are tracked and given a market value in the companion dashboard (RM per kg).</span></li>
+              <li class="cs-impact-point"><span class="cs-impact-bullet">&#8226;</span><span class="cs-impact-text">Users can cash out sorted material through the marketplace, turning waste into a micro-income stream.</span></li>
+              <li class="cs-impact-point"><span class="cs-impact-bullet">&#8226;</span><span class="cs-impact-text">Reduces downstream sorting labour costs at recycling facilities by delivering pre-categorised inputs.</span></li>
+              <li class="cs-impact-point"><span class="cs-impact-bullet">&#8226;</span><span class="cs-impact-text">Built entirely from off-the-shelf components, keeping the replication cost low enough to matter at scale.</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Block 13: Conclusion -->
+      <div class="cs-block reveal">
+        <span class="cs-block-label">Conclusion</span>
+        <h2 class="cs-block-title">What we learned</h2>
+        <div class="cs-conclusion">
+          <p>AiBin closes the loop from hardware fabrication and ML model training to a live monetization app, all running on a device that fits inside a standard bin lid. The &gt;85% classification accuracy is the headline, but the more important result is that the full system was designed, built, and demonstrated within three months by a single engineer. That timeline proves the barrier to replication is low: any school, office, or community centre with a Raspberry Pi 5 and a 3D printer can deploy an autonomous sorting station. The next step is scaling the dataset to improve edge-case accuracy and piloting a networked deployment where multiple bins report to a single collection dashboard.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Next Project -->
+  <section class="cs-next">
+    <div class="container">
+      <div class="cs-next-inner">
+        <span class="cs-next-label">Up next</span>
+        <h2 class="cs-next-title">S.D.A.S</h2>
+        <p class="cs-next-subtitle">Smart Driving Awareness System</p>
+        <a href="sdas.html" class="cs-next-btn">View case study &#8594;</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section id="contact" class="cta-section">
+    <div class="cta-inner">
+      <h2 class="cta-heading reveal">Let's build<br />something together.</h2>
+      <button class="cta-btn reveal" data-delay="0.15" data-book>Book a call &#8594;</button>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-left">
+      <a href="../index.html" class="footer-logo">.anan</a>
+      <p class="footer-copy">&copy; <span id="year"></span> Anantojo Mendan. All rights reserved.</p>
+    </div>
+    <div class="footer-links">
+      <a href="mailto:tojosenpai05@gmail.com">tojosenpai05@gmail.com</a>
+      <a href="https://github.com/tojosenpai05" target="_blank" rel="noopener noreferrer" aria-label="GitHub" class="footer-gh">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.39.6.11.82-.26.82-.58v-2.03c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.75.08-.73.08-.73 1.2.08 1.84 1.24 1.84 1.24 1.07 1.83 2.81 1.3 3.49 1 .11-.78.42-1.3.76-1.6-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1.01-.32 3.3 1.23a11.5 11.5 0 0 1 3-.4c1.02.005 2.04.14 3 .4 2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.81 1.1.81 2.22v3.29c0 .32.22.7.83.58C20.57 21.8 24 17.3 24 12c0-6.63-5.37-12-12-12z"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script src="../js/supabase-config.js"></script>
+<script src="../js/supabase-client.js"></script>
+<script src="../js/main.js"></script>
+<script src="../js/case-study.js"></script>
+</body>
+</html>
