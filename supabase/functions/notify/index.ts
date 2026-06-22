@@ -3,13 +3,15 @@ import { serve } from 'https://deno.land/std@0.177.0/http/server.ts';
 const RESEND_KEY = Deno.env.get('RESEND_API_KEY') ?? '';
 const ANAN       = 'tojosenpai05@gmail.com';
 
-async function sendEmail(to: string, subject: string, html: string): Promise<boolean> {
+async function sendEmail(to: string, subject: string, html: string): Promise<{ ok: boolean; detail: string }> {
   const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${RESEND_KEY}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ from: 'Portfolio <onboarding@resend.dev>', to, subject, html }),
   });
-  return r.ok;
+  const detail = await r.text();
+  if (!r.ok) console.error(`Resend ${r.status} for ${to}: ${detail}`);
+  return { ok: r.ok, detail };
 }
 
 const row = (label: string, value: string) =>
@@ -54,8 +56,8 @@ serve(async (req) => {
       row('Budget',   record.budget ?? 'Not specified') +
       row('Message',  record.message ?? '&mdash;');
 
-    const ok = await sendEmail(ANAN, `New booking from ${record.name}`, wrap('New Booking', ownerBody));
-    if (!ok) return new Response('Resend error (owner email)', { status: 500 });
+    const owner = await sendEmail(ANAN, `New booking from ${record.name}`, wrap('New Booking', ownerBody));
+    if (!owner.ok) return new Response(`Resend error (owner email): ${owner.detail}`, { status: 500 });
 
     if (record.email) {
       const clientBody =
@@ -80,8 +82,8 @@ serve(async (req) => {
       row('Email',   record.email) +
       row('Message', record.message);
 
-    const ok = await sendEmail(ANAN, `New message from ${record.name}`, wrap('New Message', contactBody));
-    if (!ok) return new Response('Resend error', { status: 500 });
+    const contact = await sendEmail(ANAN, `New message from ${record.name}`, wrap('New Message', contactBody));
+    if (!contact.ok) return new Response(`Resend error: ${contact.detail}`, { status: 500 });
   } else {
     return new Response('Unknown table', { status: 400 });
   }
