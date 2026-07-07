@@ -73,3 +73,22 @@ CREATE POLICY "contact_rate_limit_per_email" ON contact_messages
 DROP POLICY IF EXISTS "allow_anon_select" ON contact_messages;
 CREATE POLICY "block_anon_select_contacts" ON contact_messages
   FOR SELECT TO anon USING (false);
+
+-- 8. Housekeeping: a booking that's never confirmed (no email click) sits
+--    forever otherwise. Delete unconfirmed bookings older than 30 days,
+--    once a day. Note: this table's timestamp column is really named
+--    "create_at" (a pre-existing typo, not "created_at").
+CREATE EXTENSION IF NOT EXISTS pg_cron;
+
+DO $$
+BEGIN
+  IF EXISTS (SELECT 1 FROM cron.job WHERE jobname = 'cleanup-unconfirmed-bookings') THEN
+    PERFORM cron.unschedule('cleanup-unconfirmed-bookings');
+  END IF;
+END $$;
+
+SELECT cron.schedule(
+  'cleanup-unconfirmed-bookings',
+  '0 3 * * *',
+  $$DELETE FROM public.bookings WHERE confirmed_at IS NULL AND create_at < now() - interval '30 days';$$
+);
