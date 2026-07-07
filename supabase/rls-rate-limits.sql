@@ -19,6 +19,7 @@ ALTER TABLE bookings ADD COLUMN IF NOT EXISTS confirm_token text;
 --    (service_role client, which bypasses RLS entirely).
 DROP POLICY IF EXISTS "allow_anon_insert" ON bookings;
 DROP POLICY IF EXISTS "anon_insert" ON bookings;
+DROP POLICY IF EXISTS "allow anon inserts" ON bookings;
 DROP POLICY IF EXISTS "booking_rate_limit_per_email" ON bookings;
 CREATE POLICY "block_anon_insert" ON bookings
   FOR INSERT TO anon
