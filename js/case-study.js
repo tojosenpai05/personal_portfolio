@@ -22,6 +22,8 @@
   if (!srcs.length) return;
   let idx = 0;
   vid.src = srcs[0];
+  vid.setAttribute('controlslist', 'nodownload nofullscreen');
+  vid.disablePictureInPicture = true;
   vid.play().catch(() => {});
   vid.addEventListener('ended', () => {
     idx = (idx + 1) % srcs.length;

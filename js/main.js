@@ -125,8 +125,24 @@
   let step = 1, workType = null, selectedDate = null, selectedTime = null, selectedBudget = null;
   let calYear, calMonth;
   let submitName = '', submitEmail = '', submitMsg = '';
+  let pendingBooking = false;
+  let emailDomainValid = false;
+  let emailCheckTimer = null;
+  let submitError = '';
 
   function openModal() {
+    const lastBooking = localStorage.getItem('booking_sent');
+    if (lastBooking && Date.now() - parseInt(lastBooking) < 86400000) {
+      pendingBooking = true;
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      render();
+      return;
+    }
+    pendingBooking = false;
+    emailDomainValid = false;
+    submitError = '';
+    clearTimeout(emailCheckTimer);
     step = 1; workType = null; selectedDate = null; selectedTime = null; selectedBudget = null;
     const now = new Date();
     calYear = now.getFullYear(); calMonth = now.getMonth();
@@ -221,7 +237,7 @@
       <p class="modal-heading">Your details</p>
       <p class="modal-sub">So Anan knows who to expect.</p>
       <div class="form-field"><label>Name</label><input type="text" id="m-name" placeholder="Your full name" /></div>
-      <div class="form-field"><label>Email</label><input type="email" id="m-email" placeholder="your@email.com" /></div>
+      <div class="form-field"><label>Email</label><input type="email" id="m-email" placeholder="your@email.com" /><span id="m-email-status" style="font-size:1.2rem;min-height:1.6rem;display:block;margin-top:0.4rem;opacity:0.6;"></span></div>
       <div class="form-field">
         <label>Budget <span class="modal-label-opt">(optional)</span></label>
         <div class="budget-grid">
@@ -229,10 +245,12 @@
         </div>
       </div>
       <div class="form-field"><label>Message <span class="modal-label-opt">(optional)</span></label><textarea id="m-msg" rows="3" placeholder="Briefly describe what you need..."></textarea></div>
+      <input id="m-trap" type="text" tabindex="-1" autocomplete="off" style="opacity:0;position:absolute;top:0;left:0;height:0;width:0;z-index:-1;" />
       <div class="modal-nav">
         <button class="modal-btn-back" data-back>&#8592; Back</button>
         <button class="modal-btn-next" id="m-submit" disabled data-submit>Book a call &#8594;</button>
-      </div>`;
+      </div>
+      <span id="m-submit-error" style="font-size:1.2rem;min-height:1.6rem;display:block;margin-top:0.8rem;color:#ff6b6b;">${submitError}</span>`;
   }
 
   function renderStep5() {
@@ -244,8 +262,8 @@
           <circle class="modal-checkmark-circle" cx="26" cy="26" r="24" stroke="currentColor" stroke-width="2"/>
           <path class="modal-checkmark-tick" d="M14 26l9 9 15-16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <p class="modal-heading" style="margin-bottom:0.8rem">Booking confirmed.</p>
-        <p class="modal-sub" style="margin-bottom:2.4rem">You'll receive a confirmation email shortly.</p>
+        <p class="modal-heading" style="margin-bottom:0.8rem">Check your email to confirm.</p>
+        <p class="modal-sub" style="margin-bottom:2.4rem">We've sent a confirmation link to ${submitEmail}. Click it and Anan will get your request.</p>
         <div class="modal-success-summary">
           <div class="modal-success-row"><span class="modal-success-key">Interest</span><span class="modal-success-val">${wt}</span></div>
           <div class="modal-success-row"><span class="modal-success-key">Date</span><span class="modal-success-val">${dateStr} at ${selectedTime}</span></div>
@@ -263,8 +281,47 @@
       </div>`;
   }
 
+  async function checkEmailDomain(email) {
+    const domain = email.split('@')[1];
+    if (!domain || domain.length < 4) return false;
+    try {
+      const res = await fetch(
+        `https://dns.google/resolve?name=${encodeURIComponent(domain)}&type=MX`,
+        { signal: AbortSignal.timeout(5000) }
+      );
+      const data = await res.json();
+      return data.Status === 0 && Array.isArray(data.Answer) && data.Answer.length > 0;
+    } catch {
+      return null;
+    }
+  }
+
+  function renderPendingScreen() {
+    return `
+      <div class="modal-success">
+        <svg class="modal-checkmark" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle class="modal-checkmark-circle" cx="26" cy="26" r="24" stroke="currentColor" stroke-width="2"/>
+          <path class="modal-checkmark-tick" d="M14 26l9 9 15-16" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <p class="modal-heading" style="margin-bottom:0.8rem">You're already booked.</p>
+        <p class="modal-sub" style="margin-bottom:2.4rem">Your request was received. Anan will be in touch soon.</p>
+        <button class="modal-confirm-btn" data-close-modal>Got it</button>
+      </div>`;
+  }
+
   function render() {
     const panel = overlay.querySelector('.modal-panel');
+    if (pendingBooking) {
+      panel.innerHTML = `
+        <div class="modal-header modal-header-success">
+          <button class="modal-close" id="modal-close-btn">&#215;</button>
+        </div>
+        <div class="modal-body">${renderPendingScreen()}</div>`;
+      panel.querySelectorAll('#modal-close-btn, [data-close-modal]').forEach(btn => {
+        btn.addEventListener('click', closeModal);
+      });
+      return;
+    }
     if (step === 5 || step === 6) {
       panel.innerHTML = `
         <div class="modal-header modal-header-success">
@@ -317,20 +374,71 @@
       btn.addEventListener('click', () => { selectedTime = btn.dataset.time; render(); });
     });
 
-    box.querySelectorAll('.budget-chip').forEach(btn => {
+    const budgetChips = box.querySelectorAll('.budget-chip');
+    budgetChips.forEach(btn => {
       btn.addEventListener('click', () => {
-        selectedBudget = selectedBudget === btn.dataset.budget ? null : btn.dataset.budget;
-        render();
+        const already = selectedBudget === btn.dataset.budget;
+        selectedBudget = already ? null : btn.dataset.budget;
+        budgetChips.forEach(b => b.classList.toggle('selected', !already && b === btn));
       });
     });
 
     if (step === 4) {
       const nameEl = box.querySelector('#m-name');
       const emailEl = box.querySelector('#m-email');
+      const msgEl = box.querySelector('#m-msg');
       const submitBtn = box.querySelector('#m-submit');
-      const check = () => { submitBtn.disabled = !(nameEl.value.trim() && emailEl.value.trim()); };
-      nameEl.addEventListener('input', check);
-      emailEl.addEventListener('input', check);
+      const EMAIL_RE = /^[^\s@]+@[^\s@]{2,}\.[^\s@]{2,}$/;
+
+      const setStatus = (msg) => {
+        const el = box.querySelector('#m-email-status');
+        if (el) el.textContent = msg;
+      };
+
+      const clearError = () => {
+        if (!submitError) return;
+        submitError = '';
+        const el = box.querySelector('#m-submit-error');
+        if (el) el.textContent = '';
+      };
+
+      const updateBtn = () => {
+        submitBtn.disabled = !(
+          nameEl.value.trim() &&
+          EMAIL_RE.test(emailEl.value.trim()) &&
+          (emailDomainValid === true || emailDomainValid === null)
+        );
+      };
+
+      const check = () => {
+        const e = emailEl.value.trim();
+        clearTimeout(emailCheckTimer);
+        if (!EMAIL_RE.test(e)) {
+          emailDomainValid = false;
+          setStatus('');
+          updateBtn();
+          return;
+        }
+        setStatus('Checking...');
+        updateBtn();
+        emailCheckTimer = setTimeout(async () => {
+          emailDomainValid = await checkEmailDomain(e);
+          if (emailDomainValid === true) setStatus('Domain verified.');
+          else if (emailDomainValid === false) setStatus('Email domain not found. Check for typos.');
+          else setStatus('');
+          updateBtn();
+        }, 900);
+      };
+
+      nameEl.addEventListener('input', () => { clearError(); updateBtn(); });
+      emailEl.addEventListener('input', () => { clearError(); check(); });
+      if (msgEl) msgEl.addEventListener('input', clearError);
+      emailEl.addEventListener('blur', () => {
+        clearTimeout(emailCheckTimer);
+        const e = emailEl.value.trim();
+        if (!EMAIL_RE.test(e) || emailDomainValid !== false) return;
+        check();
+      });
     }
 
     const nextBtn = box.querySelector('[data-next]');
@@ -344,19 +452,71 @@
       submitName = box.querySelector('#m-name').value.trim();
       submitEmail = box.querySelector('#m-email').value.trim();
       submitMsg = box.querySelector('#m-msg').value.trim();
+      const trap = box.querySelector('#m-trap');
+      if (trap && trap.value) { step = 5; render(); return; }
+      const _emailRe = /^[^\s@]+@[^\s@]{2,}\.[^\s@]{2,}$/;
+      if (!_emailRe.test(submitEmail) || emailDomainValid === false) return;
       step = 6; render();
-      if (typeof _sb !== 'undefined') {
-        await _sb.from('bookings').insert({
-          name: submitName,
-          email: submitEmail,
-          work_type: workType,
-          date: selectedDate ? selectedDate.toISOString().split('T')[0] : null,
-          time: selectedTime,
-          budget: selectedBudget,
-          message: submitMsg || null,
-        });
+
+      const failBackToStep4 = (msg) => {
+        submitError = msg;
+        step = 4;
+        render();
+      };
+
+      if (typeof _sb === 'undefined') {
+        failBackToStep4('Something went wrong. Please try again.');
+        return;
       }
-      step = 5; render();
+
+      let data, error;
+      try {
+        ({ data, error } = await _sb.functions.invoke('submit-booking', {
+          body: {
+            name: submitName,
+            email: submitEmail,
+            work_type: workType,
+            date: selectedDate ? selectedDate.toISOString().split('T')[0] : null,
+            time: selectedTime,
+            budget: selectedBudget,
+            message: submitMsg || null,
+            trap: trap ? trap.value : '',
+          },
+        }));
+      } catch (_) {
+        failBackToStep4('Something went wrong. Please try again.');
+        return;
+      }
+
+      // supabase-js returns non-2xx bodies via error.context (a Response), not data.
+      if (!data && error && error.context && typeof error.context.json === 'function') {
+        try { data = await error.context.json(); } catch (_) {}
+      }
+
+      if (!data) {
+        failBackToStep4('Something went wrong. Please try again.');
+        return;
+      }
+
+      if (data && data.ok) {
+        localStorage.setItem('booking_sent', String(Date.now()));
+        step = 5; render();
+        return;
+      }
+
+      if (data && data.ok === false && data.reason === 'rate_limited') {
+        localStorage.setItem('booking_sent', String(Date.now()));
+        pendingBooking = true;
+        render();
+        return;
+      }
+
+      if (data && data.ok === false && data.reason === 'invalid_email') {
+        failBackToStep4('That email address could not be verified. Please check for typos.');
+        return;
+      }
+
+      failBackToStep4('Something went wrong. Please try again.');
     });
 
     box.querySelectorAll('[data-close-modal]').forEach(btn => {
@@ -391,3 +551,10 @@
     });
   });
 })();
+
+/* ════════════════════════════════
+   MEDIA PROTECTION
+════════════════════════════════ */
+document.addEventListener('contextmenu', e => {
+  if (e.target.closest('img, video')) e.preventDefault();
+});

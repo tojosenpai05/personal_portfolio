@@ -27,7 +27,7 @@ body {
 }
 a { text-decoration: none; color: inherit; }
 ul, ol { list-style: none; }
-img, video { display: block; max-width: 100%; }
+img, video { display: block; max-width: 100%; -webkit-user-drag: none; user-drag: none; }
 button { font-family: inherit; cursor: pointer; }
 
 /* ── Button active state ── */
