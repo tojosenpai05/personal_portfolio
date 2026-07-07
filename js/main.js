@@ -132,7 +132,7 @@
 
   function openModal() {
     const lastBooking = localStorage.getItem('booking_sent');
-    if (lastBooking && Date.now() - parseInt(lastBooking) < 86400000) {
+    if (lastBooking && Date.now() - parseInt(lastBooking) < 300000) {
       pendingBooking = true;
       overlay.classList.add('open');
       document.body.style.overflow = 'hidden';

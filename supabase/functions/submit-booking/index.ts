@@ -7,13 +7,13 @@ const SERVICE_KEY  = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 const RATE_SALT    = Deno.env.get('RATE_LIMIT_SALT') ?? '';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]{2,}\.[^\s@]{2,}$/;
-const RATE_WINDOW_MS = 24 * 60 * 60 * 1000;
+const RATE_WINDOW_MS = 5 * 60 * 1000;
 
 async function sendEmail(to: string, subject: string, html: string): Promise<{ ok: boolean; detail: string }> {
   const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${RESEND_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from: 'Portfolio <onboarding@resend.dev>', to, subject, html }),
+    body: JSON.stringify({ from: 'Anan <booking@anansportfolio.work>', to, subject, html }),
   });
   const detail = await r.text();
   if (!r.ok) console.error(`Resend ${r.status} for ${to}: ${detail}`);

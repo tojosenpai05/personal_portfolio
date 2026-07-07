@@ -10,7 +10,7 @@ async function sendEmail(to: string, subject: string, html: string): Promise<{ o
   const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${RESEND_KEY}`, 'Content-Type': 'application/json' },
-    body: JSON.stringify({ from: 'Portfolio <onboarding@resend.dev>', to, subject, html }),
+    body: JSON.stringify({ from: 'Anan <booking@anansportfolio.work>', to, subject, html }),
   });
   const detail = await r.text();
   if (!r.ok) console.error(`Resend ${r.status} for ${to}: ${detail}`);
