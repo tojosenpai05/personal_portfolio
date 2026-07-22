@@ -79,6 +79,7 @@ async function replaceInHtmlFiles(mapping) {
     path.join(ROOT, 'projects', 'sdas.html'),
     path.join(ROOT, 'projects', 'electrofuel.html'),
     path.join(ROOT, 'projects', 'mediassist.html'),
+    path.join(ROOT, 'projects', 'zeta.html'),
   ];
   const jsFiles = [
     path.join(ROOT, 'js', 'hero.js'),
